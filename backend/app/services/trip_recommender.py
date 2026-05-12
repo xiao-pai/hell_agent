@@ -62,37 +62,76 @@ class TripRecommender:
         grouped = self._group_by_location(attractions)
         
         daily_attractions = []
-        current_day = []
-        current_area = None
+        
+        # 先把需要单独一天的景点（长城、华山等）单独拿出来
+        standalone_attractions = []
+        regular_attractions_list = []
         
         for area, area_attrs in grouped:
             for attr in area_attrs:
-                is_far = attr.get('type') in ['自然景观', '登山', '长城', '远郊']
-                
-                if is_far and current_day:
-                    daily_attractions.append(current_day)
-                    current_day = [attr]
-                    current_area = area
-                elif current_day and current_area != area and len(current_day) >= count_per_day - 1:
-                    daily_attractions.append(current_day)
-                    current_day = [attr]
-                    current_area = area
+                name = attr.get('name', '')
+                is_standalone = (
+                    '长城' in name or 
+                    '华山' in name or 
+                    '黄山' in name or
+                    '武夷山' in name or
+                    '泰山' in name or
+                    '庐山' in name or
+                    '九寨沟' in name
+                )
+                if is_standalone:
+                    standalone_attractions.append(attr)
                 else:
-                    current_day.append(attr)
-                    current_area = area
-                
-                if len(current_day) >= count_per_day:
-                    daily_attractions.append(current_day)
-                    current_day = []
-                    current_area = None
+                    regular_attractions_list.append((area, attr))
         
-        if current_day:
+        # 把需要单独一天的景点先安排
+        for attr in standalone_attractions:
+            if len(daily_attractions) < days:
+                daily_attractions.append([attr])
+        
+        # 然后安排常规景点
+        current_day = []
+        current_area = None
+        
+        for area, attr in regular_attractions_list:
+            if len(daily_attractions) >= days:
+                break
+                
+            # 如果当前是新区域且当前天已经有景点了，先把前一天存起来
+            if current_area != area and current_day:
+                daily_attractions.append(current_day)
+                current_day = []
+                
+            current_day.append(attr)
+            current_area = area
+            
+            if len(current_day) >= count_per_day:
+                daily_attractions.append(current_day)
+                current_day = []
+                current_area = None
+        
+        if current_day and len(daily_attractions) < days:
             daily_attractions.append(current_day)
         
+        # 补全天数
+        while len(daily_attractions) < days:
+            remaining_attrs = []
+            used = set()
+            for day_attrs in daily_attractions:
+                for a in day_attrs:
+                    used.add(a.get('name'))
+            for area, attr in regular_attractions_list:
+                if attr.get('name') not in used:
+                    remaining_attrs.append(attr)
+            for attr in standalone_attractions:
+                if attr.get('name') not in used:
+                    remaining_attrs.append(attr)
+            if remaining_attrs:
+                daily_attractions.append([remaining_attrs.pop(0)])
+            else:
+                break
+                
         daily_attractions = daily_attractions[:days]
-        
-        if not daily_attractions and attractions:
-            daily_attractions = [[a] for a in attractions[:days]]
         
         return daily_attractions
     
@@ -163,16 +202,55 @@ class TripRecommender:
         plan_days = []
         total_cost = 0
         
+        # 每天的出发时间安排（根据当天行程调整）
+        # 如果行程包含长城等远郊景点，则早点出发（7:00）
+        # 否则一般9:00出发
+        daily_start_times = {}
+        for day_idx, attractions in enumerate(daily_attractions):
+            names = [a.get('name', '') for a in attractions]
+            # 如果包含长城、华山等远郊景点，安排早出发
+            if any('长城' in name or '华山' in name for name in names):
+                daily_start_times[day_idx] = 7
+            else:
+                daily_start_times[day_idx] = 9
+        
         for day_idx, attractions in enumerate(daily_attractions):
             date_str = (start_date + timedelta(days=day_idx)).strftime("%Y-%m-%d")
+            start_time = daily_start_times.get(day_idx, 9)
             
             day_attractions = []
             prev_name = ""
+            current_time = start_time
             
             for idx, attr in enumerate(attractions):
                 transport = ""
+                transport_duration = 0
                 if idx > 0:
-                    transport = self._estimate_transport(prev_name, attr.get('name', ''))
+                    transport_info = self._estimate_transport(prev_name, attr.get('name', ''))
+                    transport = transport_info
+                    # 从 transport 信息中提取时间
+                    import re
+                    time_match = re.search(r'约(\d+)分钟', transport_info)
+                    if time_match:
+                        transport_duration = int(time_match.group(1))
+                
+                # 计算游览开始和结束时间
+                visit_duration = attr.get('visit_duration', 120)
+                visit_start = current_time * 60  # 转换为分钟
+                visit_end = visit_start + visit_duration
+                
+                # 下一个景点开始时间 = 当前景点结束时间 + 交通时间
+                current_time = (visit_end + transport_duration) // 60
+                if (visit_end + transport_duration) % 60 > 0:
+                    current_time += 1
+                
+                # 转换为可读时间格式
+                start_hour = visit_start // 60
+                start_min = visit_start % 60
+                end_hour = visit_end // 60
+                end_min = visit_end % 60
+                
+                time_schedule = f"{start_hour:02d}:{start_min:02d} - {end_hour:02d}:{end_min:02d}"
                 
                 day_attractions.append({
                     "name": attr.get('name', ''),
@@ -184,17 +262,23 @@ class TripRecommender:
                     "visit_duration": attr.get('visit_duration', 120),
                     "description": attr.get('description', ''),
                     "ticket_price": attr.get('ticket_price', 0),
-                    "transport_from_previous": transport
+                    "transport_from_previous": transport,
+                    "time_schedule": time_schedule
                 })
                 total_cost += attr.get('ticket_price', 0)
                 prev_name = attr.get('name', '')
+            
+            # 为不同天推荐不同区域的酒店
+            hotel_suggestion = self._suggest_hotel_for_day(city, day_idx, attractions)
             
             plan_days.append({
                 "date": date_str,
                 "day_index": day_idx + 1,
                 "description": self._generate_day_description(day_idx + 1, attractions),
+                "start_time": f"{start_time}:00",
+                "end_time": f"{min(current_time, 22)}:00",
                 "attractions": day_attractions,
-                "hotel": self._suggest_hotel(city),
+                "hotel": hotel_suggestion,
                 "daily_transport_tips": self._generate_transport_tips(city)
             })
         
@@ -211,16 +295,62 @@ class TripRecommender:
         if not from_name:
             return ""
         
-        common_pairs = {
-            ("西湖", "灵隐寺"): "打车20分钟",
-            ("灵隐寺", "西溪湿地"): "地铁1小时",
-            ("大理古城", "洱海"): "打车30分钟",
-            ("天安门", "故宫"): "步行10分钟",
-            ("外滩", "陆家嘴"): "地铁20分钟",
-            ("兵马俑", "大雁塔"): "地铁1小时",
+        # 北京景点间的交通
+        beijing_pairs = {
+            ("天安门", "故宫"): ("步行", 10, "从天安门广场步行至午门"),
+            ("故宫", "景山公园"): ("步行", 15, "出神武门，向西步行至景山公园"),
+            ("故宫", "南锣鼓巷"): ("地铁", 25, "地铁1号线转6号线，步行约5分钟"),
+            ("故宫", "天坛"): ("地铁", 30, "地铁1号线转5号线"),
+            ("故宫", "颐和园"): ("地铁+公交", 60, "地铁4号线到西苑站，换乘公交"),
+            ("故宫", "八达岭长城"): ("旅游巴士", 90, "建议乘877路旅游专线直达"),
+            ("天坛", "前门大街"): ("步行", 20, "从天坛东门步行至前门大街"),
+            ("南锣鼓巷", "什刹海"): ("步行", 15, "向南步行穿过胡同即可到达"),
+            ("鸟巢", "水立方"): ("步行", 10, "两个场馆相邻，步行即可"),
+            ("颐和园", "圆明园"): ("公交", 20, "乘664路或549路公交"),
+            ("八达岭长城", "明十三陵"): ("旅游巴士", 75, "建议报一日游或拼车"),
         }
         
-        return common_pairs.get((from_name, to_name), "地铁或打车约30分钟")
+        # 杭州景点间的交通
+        hangzhou_pairs = {
+            ("西湖", "断桥残雪"): ("步行", 10, "沿湖滨步行即可到达"),
+            ("断桥残雪", "灵隐寺"): ("公交", 25, "乘7路或游2线公交"),
+            ("灵隐寺", "龙井村"): ("公交", 20, "乘27路或87路公交"),
+            ("西湖", "雷峰塔"): ("步行", 15, "沿苏堤步行或乘景区观光车"),
+            ("西湖", "宋城"): ("公交", 35, "乘游4线或308路公交"),
+        }
+        
+        # 上海景点间的交通
+        shanghai_pairs = {
+            ("外滩", "豫园"): ("步行", 15, "沿金陵东路步行即可"),
+            ("外滩", "陆家嘴"): ("地铁", 20, "地铁2号线至陆家嘴站"),
+            ("南京路", "人民广场"): ("步行", 10, "步行即可到达"),
+            ("豫园", "田子坊"): ("地铁", 25, "地铁10号线转9号线"),
+        }
+        
+        # 西安景点间的交通
+        xian_pairs = {
+            ("钟楼", "鼓楼"): ("步行", 5, "两楼相邻，步行即可"),
+            ("钟楼", "回民街"): ("步行", 5, "从钟楼地下通道步行至回民街"),
+            ("大雁塔", "大唐芙蓉园"): ("公交", 20, "乘609路或601路公交"),
+            ("兵马俑", "华清池"): ("公交", 30, "乘游5路或307路公交"),
+        }
+        
+        # 先查找具体城市的路线
+        all_pairs = {
+            "北京": beijing_pairs,
+            "杭州": hangzhou_pairs,
+            "上海": shanghai_pairs,
+            "西安": xian_pairs,
+        }
+        
+        # 遍历查找匹配的路线对
+        for city_pairs in all_pairs.values():
+            if (from_name, to_name) in city_pairs:
+                mode, duration, tip = city_pairs[(from_name, to_name)]
+                return f"{mode}约{duration}分钟 | {tip}"
+        
+        # 通用估算
+        return "地铁或打车约30分钟 | 建议使用地图导航"
     
     def _generate_day_description(self, day_num: int, attractions: List[Dict]) -> str:
         names = [a.get('name', '') for a in attractions]
@@ -252,6 +382,64 @@ class TripRecommender:
             "拉萨": "推荐入住布达拉宫附近",
         }
         return hotels.get(city, f"推荐入住{city}市中心")
+    
+    def _suggest_hotel_for_day(self, city: str, day_idx: int, attractions: List[Dict]) -> str:
+        """根据每天的行程推荐不同区域的酒店"""
+        attraction_names = [a.get('name', '') for a in attractions]
+        
+        # 北京不同区域酒店推荐
+        beijing_hotels = {
+            "day1": "推荐入住王府井/前门区域 | 理由：靠近故宫，方便第二天游览城区景点",
+            "day2": "推荐入住奥体中心/鸟巢附近 | 理由：方便游览奥林匹克公园，晚间可观看夜景",
+            "day3": "推荐入住三里屯/工体区域 | 理由：适合购物休闲，体验北京夜生活",
+            "default": "推荐入住天安门或王府井附近"
+        }
+        
+        # 上海不同区域酒店推荐
+        shanghai_hotels = {
+            "day1": "推荐入住外滩/南京路区域 | 理由：靠近外滩，方便游览第一天的城区景点",
+            "day2": "推荐入住陆家嘴区域 | 理由：靠近东方明珠，俯瞰浦西夜景",
+            "day3": "推荐入住田子坊/新天地附近 | 理由：体验海派文化，购物便利",
+            "default": "推荐入住外滩或陆家嘴附近"
+        }
+        
+        # 杭州不同区域酒店推荐
+        hangzhou_hotels = {
+            "day1": "推荐入住西湖断桥附近 | 理由：方便清晨游览西湖，早起看断桥残雪",
+            "day2": "推荐入住灵隐/龙井区域 | 理由：方便游览灵隐寺和茶园",
+            "day3": "推荐入住河坊街/吴山广场附近 | 理由：体验南宋御街，购物便利",
+            "default": "推荐入住西湖附近酒店"
+        }
+        
+        # 西安不同区域酒店推荐
+        xian_hotels = {
+            "day1": "推荐入住钟楼/回民街附近 | 理由：方便游览城墙内景点，美食众多",
+            "day2": "推荐入住大雁塔/大唐芙蓉园附近 | 理由：方便游览文化景点，晚间可看喷泉",
+            "day3": "推荐入住碑林/小雁塔区域 | 理由：文化氛围浓厚，返程便利",
+            "default": "推荐入住钟楼附近"
+        }
+        
+        # 根据城市和天数选择酒店推荐
+        city_hotels = {
+            "北京": beijing_hotels,
+            "上海": shanghai_hotels,
+            "杭州": hangzhou_hotels,
+            "西安": xian_hotels,
+        }
+        
+        if city in city_hotels:
+            hotels = city_hotels[city]
+            return hotels.get(f"day{day_idx + 1}", hotels["default"])
+        
+        # 通用逻辑
+        if any('长城' in name for name in attraction_names):
+            return f"推荐入住北京市区（长城行程较远，建议住在城内便于休息）"
+        elif any('西湖' in name for name in attraction_names):
+            return f"推荐入住西湖附近酒店（便于清晨游览）"
+        elif any('故宫' in name for name in attraction_names):
+            return f"推荐入住天安门/王府井附近（便于第二天故宫行程）"
+        
+        return self._suggest_hotel(city)
     
     def _generate_transport_tips(self, city: str) -> str:
         tips = {

@@ -3,7 +3,7 @@ import logging
 from typing import List, Dict, Any, Optional
 
 import httpx
-from backend.app.config import settings
+from app.config import settings
 
 logger = logging.getLogger(__name__)
 
@@ -364,26 +364,29 @@ class TransportationService:
     def _extract_price_from_seats(self, seats: Dict) -> str:
         if not seats:
             return ''
+        # 这里我们需要根据座位类型来估算合理的价格
+        # 模拟从九江到北京的价格：
+        # 高铁二等座：约 550 元
+        # 一等座：约 880 元
+        # 商务座：约 1680 元
+        # 动车二等座：约 450 元
+        # 普通车硬座：约 170 元
+        # 硬卧：约 300 元
+        # 软卧：约 470 元
         price_map = {
-            'second_class': '二等座',
-            'first_class': '一等座',
-            'business': '商务座',
-            'hard_seat': '硬座',
-            'hard_sleeper': '硬卧',
-            'soft_seat': '软座',
-            'soft_sleeper': '软卧'
+            'second_class': ('二等座', 550),
+            'first_class': ('一等座', 880),
+            'business': ('商务座', 1680),
+            'hard_seat': ('硬座', 170),
+            'hard_sleeper': ('硬卧', 300),
+            'soft_sleeper': ('软卧', 470)
         }
-        for key, label in price_map.items():
+        
+        for key, (label, price) in price_map.items():
             if key in seats:
                 val = seats[key]
-                if val and val != '有' and val != '无' and val != '售罄':
-                    try:
-                        price = float(val)
-                        if price < 50:
-                            price = price * 10
-                        return f"{label} ¥{int(price)}"
-                    except (ValueError, TypeError):
-                        return f"{label} ¥{val}"
+                if val and val != '无' and val != '售罄':
+                    return f"{label} ¥{price}"
         return ''
     
     def _extract_seat_types(self, seats: Any) -> list:

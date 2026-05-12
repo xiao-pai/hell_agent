@@ -15,6 +15,38 @@
       
       <a-divider />
       
+      <div v-if="plan.weather" class="weather-section">
+        <h3>🌤️ 天气预报</h3>
+        <a-descriptions bordered :column="1">
+          <a-descriptions-item label="城市">{{ plan.weather.city }}</a-descriptions-item>
+          <a-descriptions-item label="今日天气">
+            {{ plan.weather.today?.weather || '暂无数据' }}，温度：{{ plan.weather.today?.low_temp || '-' }}°C ~ {{ plan.weather.today?.high_temp || '-' }}°C
+          </a-descriptions-item>
+          <a-descriptions-item label="出行建议">
+            {{ plan.weather.today?.description || '暂无建议' }}
+          </a-descriptions-item>
+        </a-descriptions>
+        <a-divider />
+      </div>
+      
+      <div v-if="plan.hotels && plan.hotels.length > 0" class="hotels-section">
+        <h3>🏨 推荐酒店</h3>
+        <a-list :data-source="plan.hotels" :grid="{ gutter: 16, column: 3 }">
+          <template #renderItem="{ item }">
+            <a-list-item>
+              <a-card hoverable>
+                <template #title>{{ item.name }}</template>
+                <p>📍 {{ item.address }}</p>
+                <p>💰 ¥{{ item.price }}/晚</p>
+                <p>⭐ {{ item.rating }}分</p>
+                <p>🏷️ {{ item.type }}</p>
+              </a-card>
+            </a-list-item>
+          </template>
+        </a-list>
+        <a-divider />
+      </div>
+      
       <div class="days-container">
         <div v-for="(day, idx) in plan.days" :key="idx" class="day-section">
           <div class="day-header">
@@ -90,6 +122,22 @@
             </a-list>
           </div>
           <a-empty v-else description="暂无目的城市内交通推荐" />
+        </a-card>
+        
+        <a-card v-if="plan.tourist_routes && plan.tourist_routes.length > 0" title="🚂 旅游专列推荐" :bordered="false" class="transport-card" style="margin-top: 16px;">
+          <a-list :data-source="plan.tourist_routes" :grid="{ gutter: 16, column: 2 }">
+            <template #renderItem="{ item }">
+              <a-list-item>
+                <a-card hoverable>
+                  <template #title>{{ item.name }}</template>
+                  <p>{{ item.description }}</p>
+                  <p>🏷️ 难度：{{ item.difficulty }}</p>
+                  <p>⏱️ 推荐天数：{{ item.recommended_days }}天</p>
+                  <p>🌸 最佳季节：{{ item.best_season }}</p>
+                </a-card>
+              </a-list-item>
+            </template>
+          </a-list>
         </a-card>
       </div>
       
@@ -193,6 +241,12 @@ onMounted(() => {
 .date-range {
   margin: 0;
   color: #8c8c8c;
+}
+.weather-section {
+  margin-bottom: 16px;
+}
+.hotels-section {
+  margin-bottom: 16px;
 }
 .day-section {
   margin-bottom: 24px;

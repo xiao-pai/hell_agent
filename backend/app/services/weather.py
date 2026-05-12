@@ -15,12 +15,16 @@ class WeatherService:
             
             mock_weather = {
                 "city": city,
+                "today": {
+                    "weather": "晴", 
+                    "high_temp": 28, 
+                    "low_temp": 18, 
+                    "description": "晴朗舒适，适合出行"
+                },
                 "forecast": [
-                    {"date": "2026-05-15", "weather": "晴", "high_temp": 28, "low_temp": 18, "description": "晴朗舒适"},
-                    {"date": "2026-05-16", "weather": "多云", "high_temp": 26, "low_temp": 17, "description": "多云转晴"},
-                    {"date": "2026-05-17", "weather": "小雨", "high_temp": 24, "low_temp": 16, "description": "有小雨，建议带伞"},
-                    {"date": "2026-05-18", "weather": "晴", "high_temp": 27, "low_temp": 18, "description": "阳光明媚"},
-                    {"date": "2026-05-19", "weather": "阴", "high_temp": 25, "low_temp": 17, "description": "阴天"},
+                    {"date": "2026-05-13", "weather": "晴", "high_temp": 28, "low_temp": 18, "description": "晴朗舒适"},
+                    {"date": "2026-05-14", "weather": "多云", "high_temp": 26, "low_temp": 17, "description": "多云转晴"},
+                    {"date": "2026-05-15", "weather": "小雨", "high_temp": 24, "low_temp": 16, "description": "有小雨，建议带伞"},
                 ],
                 "tips": "未来几天天气整体较好，建议携带薄外套和雨具"
             }

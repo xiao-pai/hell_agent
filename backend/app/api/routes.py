@@ -2,15 +2,15 @@ import logging
 from typing import List
 
 from fastapi import APIRouter, HTTPException, Query
-from backend.app.models.schemas import TripPlanRequest, TripPlan
-from backend.app.agents.trip_planner import TripPlannerAgent
-from backend.app.services.transportation import TransportationService
-from backend.app.services.attractions import AttractionsService
-from backend.app.services.online_attractions import OnlineAttractionsService
-from backend.app.services.weather_api import WeatherAPIService
-from backend.app.services.hotels_api import HotelsAPIService
-from backend.app.services.food_api import FoodAPIService
-from backend.app.services.tickets_api import TicketsAPIService
+from app.models.schemas import TripPlanRequest, TripPlan
+from app.agents.trip_planner import TripPlannerAgent
+from app.services.transportation import TransportationService
+from app.services.attractions import AttractionsService
+from app.services.online_attractions import OnlineAttractionsService
+from app.services.weather_api import WeatherAPIService
+from app.services.hotels_api import HotelsAPIService
+from app.services.food_api import FoodAPIService
+from app.services.tickets_api import TicketsAPIService
 
 logger = logging.getLogger(__name__)
 router = APIRouter()

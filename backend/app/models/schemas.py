@@ -36,6 +36,7 @@ class TouristRoute(BaseModel):
 
 class WeatherForecast(BaseModel):
     city: str
+    today: Optional[dict] = None
     forecast: List[dict] = []
     tips: str = ""
 
