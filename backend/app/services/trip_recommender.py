@@ -62,37 +62,76 @@ class TripRecommender:
         grouped = self._group_by_location(attractions)
         
         daily_attractions = []
-        current_day = []
-        current_area = None
+        
+        # 先把需要单独一天的景点（长城、华山等）单独拿出来
+        standalone_attractions = []
+        regular_attractions_list = []
         
         for area, area_attrs in grouped:
             for attr in area_attrs:
-                is_far = attr.get('type') in ['自然景观', '登山', '长城', '远郊']
-                
-                if is_far and current_day:
-                    daily_attractions.append(current_day)
-                    current_day = [attr]
-                    current_area = area
-                elif current_day and current_area != area and len(current_day) >= count_per_day - 1:
-                    daily_attractions.append(current_day)
-                    current_day = [attr]
-                    current_area = area
+                name = attr.get('name', '')
+                is_standalone = (
+                    '长城' in name or 
+                    '华山' in name or 
+                    '黄山' in name or
+                    '武夷山' in name or
+                    '泰山' in name or
+                    '庐山' in name or
+                    '九寨沟' in name
+                )
+                if is_standalone:
+                    standalone_attractions.append(attr)
                 else:
-                    current_day.append(attr)
-                    current_area = area
-                
-                if len(current_day) >= count_per_day:
-                    daily_attractions.append(current_day)
-                    current_day = []
-                    current_area = None
+                    regular_attractions_list.append((area, attr))
         
-        if current_day:
+        # 把需要单独一天的景点先安排
+        for attr in standalone_attractions:
+            if len(daily_attractions) < days:
+                daily_attractions.append([attr])
+        
+        # 然后安排常规景点
+        current_day = []
+        current_area = None
+        
+        for area, attr in regular_attractions_list:
+            if len(daily_attractions) >= days:
+                break
+                
+            # 如果当前是新区域且当前天已经有景点了，先把前一天存起来
+            if current_area != area and current_day:
+                daily_attractions.append(current_day)
+                current_day = []
+                
+            current_day.append(attr)
+            current_area = area
+            
+            if len(current_day) >= count_per_day:
+                daily_attractions.append(current_day)
+                current_day = []
+                current_area = None
+        
+        if current_day and len(daily_attractions) < days:
             daily_attractions.append(current_day)
         
+        # 补全天数
+        while len(daily_attractions) < days:
+            remaining_attrs = []
+            used = set()
+            for day_attrs in daily_attractions:
+                for a in day_attrs:
+                    used.add(a.get('name'))
+            for area, attr in regular_attractions_list:
+                if attr.get('name') not in used:
+                    remaining_attrs.append(attr)
+            for attr in standalone_attractions:
+                if attr.get('name') not in used:
+                    remaining_attrs.append(attr)
+            if remaining_attrs:
+                daily_attractions.append([remaining_attrs.pop(0)])
+            else:
+                break
+                
         daily_attractions = daily_attractions[:days]
-        
-        if not daily_attractions and attractions:
-            daily_attractions = [[a] for a in attractions[:days]]
         
         return daily_attractions
     
