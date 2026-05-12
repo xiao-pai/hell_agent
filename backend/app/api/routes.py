@@ -7,7 +7,10 @@ from backend.app.agents.trip_planner import TripPlannerAgent
 from backend.app.services.transportation import TransportationService
 from backend.app.services.attractions import AttractionsService
 from backend.app.services.online_attractions import OnlineAttractionsService
-from backend.app.services.weather import WeatherService
+from backend.app.services.weather_api import WeatherAPIService
+from backend.app.services.hotels_api import HotelsAPIService
+from backend.app.services.food_api import FoodAPIService
+from backend.app.services.tickets_api import TicketsAPIService
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
@@ -15,7 +18,10 @@ planner = TripPlannerAgent()
 transportation_service = TransportationService()
 attractions_service = AttractionsService()
 online_attractions_service = OnlineAttractionsService()
-weather_service = WeatherService()
+weather_api_service = WeatherAPIService()
+hotels_api_service = HotelsAPIService()
+food_api_service = FoodAPIService()
+tickets_api_service = TicketsAPIService()
 
 @router.post("/plan", response_model=TripPlan)
 async def create_trip_plan(request: TripPlanRequest):
@@ -105,7 +111,7 @@ async def get_cities():
 async def get_weather(city: str = Query(..., description="城市名称")):
     logger.info("Getting weather for city=%s", city)
     try:
-        weather = await weather_service.get_weather_forecast(city)
+        weather = await weather_api_service.get_weather(city)
         if weather:
             return {"success": True, **weather}
         else:
@@ -126,4 +132,59 @@ async def search_attractions_online(
         return {"success": True, "count": len(attractions), "attractions": attractions}
     except Exception as e:
         logger.exception("Failed to search attractions online")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/hotels")
+async def search_hotels(
+    city: str = Query(..., description="城市名称"),
+    check_in: str = Query(None, description="入住日期"),
+    check_out: str = Query(None, description="退房日期"),
+    budget_min: int = Query(0, description="最低预算"),
+    budget_max: int = Query(10000, description="最高预算"),
+    limit: int = Query(10, ge=1, le=20, description="返回数量")
+):
+    logger.info("Searching hotels: city=%s, budget=%d-%d", city, budget_min, budget_max)
+    try:
+        hotels = await hotels_api_service.search_hotels(city, check_in, check_out, budget_min, budget_max, limit)
+        return {"success": True, "count": len(hotels), "hotels": hotels}
+    except Exception as e:
+        logger.exception("Failed to search hotels")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/restaurants")
+async def search_restaurants(
+    city: str = Query(..., description="城市名称"),
+    keyword: str = Query(None, description="搜索关键词"),
+    limit: int = Query(10, ge=1, le=20, description="返回数量")
+):
+    logger.info("Searching restaurants: city=%s, keyword=%s", city, keyword)
+    try:
+        restaurants = await food_api_service.search_restaurants(city, keyword, limit)
+        return {"success": True, "count": len(restaurants), "restaurants": restaurants}
+    except Exception as e:
+        logger.exception("Failed to search restaurants")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/specialties")
+async def get_specialties(city: str = Query(..., description="城市名称")):
+    logger.info("Getting local specialties for city=%s", city)
+    try:
+        specialties = await food_api_service.get_local_specialties(city)
+        return {"success": True, "count": len(specialties), "specialties": specialties}
+    except Exception as e:
+        logger.exception("Failed to get specialties")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/tickets")
+async def search_tickets(
+    keyword: str = Query(..., description="景点名称"),
+    city: str = Query(None, description="城市名称"),
+    limit: int = Query(10, ge=1, le=20, description="返回数量")
+):
+    logger.info("Searching tickets: keyword=%s, city=%s", keyword, city)
+    try:
+        tickets = await tickets_api_service.search_tickets(keyword, city, limit)
+        return {"success": True, "count": len(tickets), "tickets": tickets}
+    except Exception as e:
+        logger.exception("Failed to search tickets")
         raise HTTPException(status_code=500, detail=str(e))
