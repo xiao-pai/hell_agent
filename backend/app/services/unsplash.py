@@ -1,5 +1,5 @@
 import httpx
-from backend.app.config import settings
+from app.config import settings
 
 class UnsplashService:
     def __init__(self):

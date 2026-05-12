@@ -3,13 +3,13 @@ import logging
 import re
 from typing import Optional
 from openai import AsyncOpenAI
-from backend.app.config import settings
-from backend.app.models.schemas import TripPlan, TripPlanRequest, DayPlan, WeatherForecast, HotelSuggestion
-from backend.app.services.transportation import TransportationService
-from backend.app.services.weather import WeatherService
-from backend.app.services.hotels import HotelsService
-from backend.app.services.attractions import AttractionsService
-from backend.app.services.trip_recommender import TripRecommender
+from app.config import settings
+from app.models.schemas import TripPlan, TripPlanRequest, DayPlan, WeatherForecast, HotelSuggestion
+from app.services.transportation import TransportationService
+from app.services.weather import WeatherService
+from app.services.hotels import HotelsService
+from app.services.attractions import AttractionsService
+from app.services.trip_recommender import TripRecommender
 
 logger = logging.getLogger(__name__)
 

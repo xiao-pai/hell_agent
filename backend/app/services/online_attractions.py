@@ -2,7 +2,7 @@ import logging
 import httpx
 from typing import List, Dict, Any, Optional
 
-from backend.app.config import settings
+from app.config import settings
 
 logger = logging.getLogger(__name__)
 
@@ -112,7 +112,7 @@ class OnlineAttractionsService:
         return []
     
     def _search_local_fallback(self, keyword: str, city: str = None) -> List[Dict[str, Any]]:
-        from backend.app.services.attractions import AttractionsService
+        from app.services.attractions import AttractionsService
         
         local_service = AttractionsService()
         

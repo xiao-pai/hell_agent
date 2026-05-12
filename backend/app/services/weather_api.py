@@ -2,7 +2,7 @@ import logging
 import httpx
 from typing import Dict, Any, Optional
 
-from backend.app.config import settings
+from app.config import settings
 
 logger = logging.getLogger(__name__)
 

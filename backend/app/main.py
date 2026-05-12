@@ -1,19 +1,26 @@
 import sys
 import logging
+import os
 
 if hasattr(sys.stdout, 'reconfigure'):
     sys.stdout.reconfigure(encoding='utf-8', errors='replace')
 if hasattr(sys.stderr, 'reconfigure'):
     sys.stderr.reconfigure(encoding='utf-8', errors='replace')
 
-from backend.app.config import settings, setup_logging
+# 确保能找到 app 模块
+current_dir = os.path.dirname(os.path.abspath(__file__))
+parent_dir = os.path.dirname(current_dir)
+if parent_dir not in sys.path:
+    sys.path.insert(0, parent_dir)
+
+from app.config import settings, setup_logging
 
 setup_logging()
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from backend.app.api.routes import router
+from app.api.routes import router
 
 app = FastAPI(title="智能旅行助手 API", version="1.0.0")
 logger = logging.getLogger("uvicorn")
@@ -68,4 +75,4 @@ async def health_check():
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("backend.app.main:app", host=settings.HOST, port=settings.PORT, reload=True, log_level=settings.LOG_LEVEL.lower())
+    uvicorn.run("app.main:app", host=settings.HOST, port=settings.PORT, reload=True, log_level=settings.LOG_LEVEL.lower())
