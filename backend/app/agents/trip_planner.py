@@ -80,6 +80,7 @@ class TripPlannerAgent:
         if weather:
             weather_forecast = WeatherForecast(
                 city=weather.get("city", ""),
+                today=weather.get("today"),
                 forecast=weather.get("forecast", []),
                 tips=weather.get("tips", "")
             )
