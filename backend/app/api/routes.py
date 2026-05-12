@@ -6,6 +6,7 @@ from backend.app.models.schemas import TripPlanRequest, TripPlan
 from backend.app.agents.trip_planner import TripPlannerAgent
 from backend.app.services.transportation import TransportationService
 from backend.app.services.attractions import AttractionsService
+from backend.app.services.online_attractions import OnlineAttractionsService
 from backend.app.services.weather import WeatherService
 
 logger = logging.getLogger(__name__)
@@ -13,6 +14,7 @@ router = APIRouter()
 planner = TripPlannerAgent()
 transportation_service = TransportationService()
 attractions_service = AttractionsService()
+online_attractions_service = OnlineAttractionsService()
 weather_service = WeatherService()
 
 @router.post("/plan", response_model=TripPlan)
@@ -110,4 +112,18 @@ async def get_weather(city: str = Query(..., description="城市名称")):
             return {"success": False, "error": "获取天气失败"}
     except Exception as e:
         logger.exception("Failed to get weather")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/search-attractions-online")
+async def search_attractions_online(
+    keyword: str = Query(..., description="搜索关键词"),
+    city: str = Query(None, description="城市筛选（可选）"),
+    limit: int = Query(10, ge=1, le=50, description="返回数量")
+):
+    logger.info("Online search attractions: keyword=%s, city=%s", keyword, city)
+    try:
+        attractions = await online_attractions_service.search_attractions(keyword, city, limit)
+        return {"success": True, "count": len(attractions), "attractions": attractions}
+    except Exception as e:
+        logger.exception("Failed to search attractions online")
         raise HTTPException(status_code=500, detail=str(e))

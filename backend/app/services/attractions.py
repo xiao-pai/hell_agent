@@ -6,6 +6,23 @@ logger = logging.getLogger(__name__)
 class AttractionsService:
     def __init__(self):
         self.attractions_db = {
+            "九江": [
+                {"name": "庐山", "address": "九江市庐山市", "longitude": 115.96735, "latitude": 29.57345, 
+                 "description": "世界文化遗产，中国著名避暑胜地，风景秀丽", "ticket_price": 160, "open_time": "06:00-20:00", 
+                 "visit_duration": 360, "popularity": 5, "type": "自然景观"},
+                {"name": "鄱阳湖", "address": "九江市鄱阳县", "longitude": 116.23456, "latitude": 29.01234, 
+                 "description": "中国最大淡水湖，候鸟天堂", "ticket_price": 120, "open_time": "08:00-18:00", 
+                 "visit_duration": 240, "popularity": 4, "type": "自然景观"},
+                {"name": "浔阳楼", "address": "九江市浔阳区滨江东路908号", "longitude": 115.91342, "latitude": 29.71456, 
+                 "description": "江南十大名楼之一，因《水浒传》而闻名", "ticket_price": 20, "open_time": "08:00-17:30", 
+                 "visit_duration": 60, "popularity": 3, "type": "人文古迹"},
+                {"name": "烟水亭", "address": "九江市浔阳区甘棠南路1号", "longitude": 115.90456, "latitude": 29.70891, 
+                 "description": "建于唐代，相传为周瑜点将台", "ticket_price": 0, "open_time": "全天", 
+                 "visit_duration": 60, "popularity": 2, "type": "人文古迹"},
+                {"name": "东林寺", "address": "九江市庐山市东林路", "longitude": 115.98765, "latitude": 29.60345, 
+                 "description": "中国佛教净土宗发源地，千年古刹", "ticket_price": 0, "open_time": "08:00-17:00", 
+                 "visit_duration": 90, "popularity": 3, "type": "人文古迹"},
+            ],
             "杭州": [
                 {"name": "西湖", "address": "杭州市西湖区", "longitude": 120.153576, "latitude": 30.287459, 
                  "description": "杭州最著名的景点，湖光山色美不胜收", "ticket_price": 0, "open_time": "全天", 

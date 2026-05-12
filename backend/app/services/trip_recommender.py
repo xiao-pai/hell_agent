@@ -58,20 +58,104 @@ class TripRecommender:
         }
         
         count_per_day = daily_counts.get(travel_style, 3)
+        
+        grouped = self._group_by_location(attractions)
+        
         daily_attractions = []
+        current_day = []
+        current_area = None
         
-        for i in range(days):
-            start_idx = i * count_per_day
-            day_attractions = attractions[start_idx:start_idx + count_per_day]
-            if day_attractions:
-                daily_attractions.append(day_attractions)
-            else:
-                break
+        for area, area_attrs in grouped:
+            for attr in area_attrs:
+                is_far = attr.get('type') in ['自然景观', '登山', '长城', '远郊']
+                
+                if is_far and current_day:
+                    daily_attractions.append(current_day)
+                    current_day = [attr]
+                    current_area = area
+                elif current_day and current_area != area and len(current_day) >= count_per_day - 1:
+                    daily_attractions.append(current_day)
+                    current_day = [attr]
+                    current_area = area
+                else:
+                    current_day.append(attr)
+                    current_area = area
+                
+                if len(current_day) >= count_per_day:
+                    daily_attractions.append(current_day)
+                    current_day = []
+                    current_area = None
         
-        if not daily_attractions:
-            daily_attractions = [[attractions[0]]] if attractions else []
+        if current_day:
+            daily_attractions.append(current_day)
+        
+        daily_attractions = daily_attractions[:days]
+        
+        if not daily_attractions and attractions:
+            daily_attractions = [[a] for a in attractions[:days]]
         
         return daily_attractions
+    
+    def _group_by_location(self, attractions: List[Dict]) -> list:
+        location_groups = {
+            "北京": {
+                "城区核心": ["故宫", "天安门", "人民广场", "南锣鼓巷", "什刹海", "王府井", "前门"],
+                "西北郊": ["颐和园", "圆明园", "北京大学", "清华大学", "香山"],
+                "远郊": ["八达岭长城", "慕田峪长城", "明十三陵"],
+                "奥林匹克": ["奥林匹克公园", "鸟巢", "水立方"]
+            },
+            "杭州": {
+                "西湖周边": ["西湖", "断桥残雪", "雷峰塔", "苏堤", "白堤", "岳王庙"],
+                "西部景区": ["灵隐寺", "飞来峰", "龙井村", "九溪烟树"],
+                "郊区": ["西溪湿地", "千岛湖"]
+            },
+            "上海": {
+                "浦西": ["外滩", "豫园", "南京路", "人民广场", "田子坊"],
+                "浦东": ["陆家嘴", "东方明珠", "上海中心", "环球金融中心"],
+                "郊区": ["迪士尼", "朱家角"]
+            },
+            "西安": {
+                "市区": ["兵马俑", "大雁塔", "小雁塔", "陕西历史博物馆", "钟楼", "鼓楼"],
+                "城墙内": ["回民街", "碑林"],
+                "郊区": ["华山"]
+            },
+            "大理": {
+                "古城": ["大理古城", "人民路"],
+                "洱海周边": ["洱海", "双廊古镇", "喜洲古镇", "海舌生态公园"],
+                "苍山": ["苍山", "崇圣寺三塔"]
+            }
+        }
+        
+        groups = []
+        city = attractions[0].get('city', '') if attractions else ''
+        city_groups = location_groups.get(city, {})
+        
+        if city_groups:
+            remaining = []
+            for area, keywords in city_groups.items():
+                area_attrs = []
+                for attr in attractions:
+                    name = attr.get('name', '')
+                    if any(keyword in name for keyword in keywords):
+                        area_attrs.append(attr)
+                if area_attrs:
+                    groups.append((area, area_attrs))
+            
+            all_grouped = set()
+            for _, attrs in groups:
+                for attr in attrs:
+                    all_grouped.add(attr.get('name', ''))
+            
+            for attr in attractions:
+                if attr.get('name', '') not in all_grouped:
+                    remaining.append(attr)
+            
+            if remaining:
+                groups.append(("其他", remaining))
+        else:
+            groups.append(("全部", attractions))
+        
+        return groups
     
     def _generate_plan(self, city: str, days: int, daily_attractions: List[List[Dict]]) -> dict:
         start_date = datetime.now() + timedelta(days=1)
@@ -144,6 +228,7 @@ class TripRecommender:
     
     def _suggest_hotel(self, city: str) -> str:
         hotels = {
+            "九江": "推荐入住浔阳区或庐山脚下，方便游览",
             "杭州": "推荐入住西湖附近酒店，方便出行",
             "大理": "推荐入住大理古城内客栈",
             "上海": "推荐入住外滩或陆家嘴附近",
@@ -170,6 +255,7 @@ class TripRecommender:
     
     def _generate_transport_tips(self, city: str) -> str:
         tips = {
+            "九江": "九江景点较为分散，建议打车或自驾前往，庐山景区需乘坐景区交通车",
             "杭州": "杭州地铁覆盖主要景点，建议购买地铁卡",
             "大理": "古城内步行即可，去洱海建议打车或包车",
             "上海": "地铁非常方便，推荐使用Metro大都会APP",
@@ -196,6 +282,7 @@ class TripRecommender:
     
     def _generate_overall_suggestions(self, city: str, days: int) -> str:
         suggestions = {
+            "九江": f"九江{days}日游，庐山是核心景点，建议安排一整天游览。鄱阳湖观鸟最佳季节是冬季。",
             "杭州": f"杭州{days}日游，西湖是必去景点，灵隐寺香火旺盛值得一去。",
             "大理": f"大理{days}日游，洱海环湖骑行是特色体验，古城夜景很美。",
             "上海": f"上海{days}日游，外滩夜景和陆家嘴天际线不容错过。",

@@ -377,7 +377,13 @@ class TransportationService:
             if key in seats:
                 val = seats[key]
                 if val and val != '有' and val != '无' and val != '售罄':
-                    return f"{label} ¥{val}"
+                    try:
+                        price = float(val)
+                        if price < 50:
+                            price = price * 10
+                        return f"{label} ¥{int(price)}"
+                    except (ValueError, TypeError):
+                        return f"{label} ¥{val}"
         return ''
     
     def _extract_seat_types(self, seats: Any) -> list:
