@@ -1,0 +1,4 @@
+{"ts": "2026-04-28T10:53:54.065454", "session_id": "s-20260428-105354-c600", "step": null, "event": "session_start", "payload": {"agent_name": "AttractionSearch", "agent_type": "SimpleAgent"}}
+{"ts": "2026-04-28T10:53:54.065538", "session_id": "s-20260428-105354-c600", "step": null, "event": "message_written", "payload": {"role": "user", "content": "搜索北京的历史文化景点"}}
+{"ts": "2026-04-28T10:53:54.694482", "session_id": "s-20260428-105354-c600", "step": 1, "event": "error", "payload": {"error_type": "LLM_ERROR", "message": "OpenAI Function Calling调用失败: Error code: 404"}}
+{"ts": "2026-04-28T10:53:54.700221", "session_id": "s-20260428-105354-c600", "step": null, "event": "session_end", "payload": {"duration": 0.635119, "total_steps": 1, "final_answer": "", "status": "success"}}

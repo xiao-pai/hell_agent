@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Trace: s-20260428-154801-ee0b</title>
+    <style>
+        body {
+            font-family: 'Consolas', 'Monaco', monospace;
+            padding: 20px;
+            background: #1a1a1a;
+            color: #e0e0e0;
+            margin: 0;
+        }
+        .header {
+            background: #2a2a2a;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .header h1 {
+            margin: 0 0 10px 0;
+            color: #4af626;
+        }
+        .stats-panel {
+            background: #2a2a2a;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .stat-item {
+            background: #1a1a1a;
+            padding: 15px;
+            border-radius: 5px;
+            border-left: 3px solid #4af626;
+        }
+        .stat-label {
+            display: block;
+            color: #888;
+            font-size: 12px;
+            margin-bottom: 5px;
+        }
+        .stat-value {
+            display: block;
+            color: #e0e0e0;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        .tool-stats {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        .tool-stats th, .tool-stats td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #333;
+        }
+        .tool-stats th {
+            color: #4af626;
+        }
+        .error-list {
+            list-style: none;
+            padding: 0;
+        }
+        .error-list li {
+            background: #331111;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 5px;
+            border-left: 3px solid #ff4444;
+        }
+        .events-container {
+            background: #2a2a2a;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        .event {
+            border: 1px solid #333;
+            margin: 10px 0;
+            padding: 15px;
+            border-radius: 5px;
+            background: #1a1a1a;
+        }
+        .event-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .step {
+            color: #888;
+            font-size: 12px;
+        }
+        .timestamp {
+            color: #666;
+            font-size: 11px;
+        }
+        .event-type {
+            color: #4af626;
+            font-weight: bold;
+        }
+        .expandable {
+            cursor: pointer;
+            color: #4af626;
+            user-select: none;
+        }
+        .expandable:hover {
+            color: #6fff48;
+        }
+        .details {
+            display: none;
+            margin-top: 10px;
+            padding: 10px;
+            background: #0d0d0d;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+        .details pre {
+            margin: 0;
+            color: #e0e0e0;
+        }
+        .tool-call {
+            border-left: 3px solid #4af626;
+        }
+        .tool-result {
+            border-left: 3px solid #ffd700;
+        }
+        .error {
+            border-left: 3px solid #ff4444;
+            background: #2a1a1a;
+        }
+        .model-output {
+            border-left: 3px solid #00bfff;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🔍 Trace Session: s-20260428-154801-ee0b</h1>
+        <p>生成时间: 2026-04-28 15:48:01</p>
+    </div>
+
+    <div class="events-container">
+        <h2>📋 事件列表</h2>
+
+        <div class="event">
+            <div class="event-header">
+                <span class="step">Step -</span>
+                <span class="timestamp">2026-04-28T15:48:01.602852</span>
+                <span class="event-type">session_start</span>
+                <span class="expandable" onclick="toggleDetails('details-1')">[▼ 详情]</span>
+            </div>
+            <div id="details-1" class="details">
+                <pre>{
+  "agent_name": "AttractionSearch",
+  "agent_type": "SimpleAgent"
+}</pre>
+            </div>
+        </div>
+
+        <div class="event">
+            <div class="event-header">
+                <span class="step">Step -</span>
+                <span class="timestamp">2026-04-28T15:48:01.603021</span>
+                <span class="event-type">message_written</span>
+                <span class="expandable" onclick="toggleDetails('details-2')">[▼ 详情]</span>
+            </div>
+            <div id="details-2" class="details">
+                <pre>{
+  "role": "user",
+  "content": "搜索Shanghai的文化、美食景点"
+}</pre>
+            </div>
+        </div>
+
+        <div class="event">
+            <div class="event-header">
+                <span class="step">Step -</span>
+                <span class="timestamp">2026-04-28T15:48:34.072553</span>
+                <span class="event-type">session_end</span>
+                <span class="expandable" onclick="toggleDetails('details-3')">[▼ 详情]</span>
+            </div>
+            <div id="details-3" class="details">
+                <pre>{
+  "duration": 32.470052,
+  "final_answer": "以下为您推荐上海的文化与美食景点，涵盖地标性文化场所与地道美食体验地，并附有地址、经纬度及简要描述。\n\n### 🏛️ 文化景点\n\n1. **上海博物馆（人民广场馆）**\n   - **地址**：上海市黄浦区人民大道201号\n   - **经纬度**：31.2304, 121.4702\n   - **描述**：中国古代艺术博物馆，收藏青铜器、陶瓷、书画等珍贵文物逾百万件，建筑造型“天圆地方”，是了解中华文明的重要窗口。\n\n2. **豫园 & 城隍庙**\n   - **地址**：上海市黄浦区福佑路168号（豫园）；方浜中路249号（城隍庙）\n   - **经纬度**：31.2272, 121.4878\n   - **描述**：明代江南古典园林，亭台楼阁、假山池沼精妙雅致。毗邻的城隍庙是上海道教正一派主要道观，周边街巷为传统工艺与小吃聚集地。\n\n3. **中华艺术宫（原世博中国馆）**\n   - **地址**：上海市浦东新区上南路205号\n   - **经纬度**：31.1863, 121.4841\n   - **描述**：由2010年世博会中国馆改建而成，以多媒体版《清明上河图》为镇馆之宝，常设中国近现代美术展览，建筑本身为红色“东方之冠”造型。\n\n4. **田子坊**\n   - **地址**：上海市黄浦区泰康路210弄\n   - **经纬度**：31.2091, 121.4679\n   - **描述**：由弄堂石库门改造而成的创意街区，窄巷里汇聚画廊、手工艺品店、咖啡馆与工作室，展现老上海市井生活与当代艺术的交融。\n\n5. **1933老场坊**\n   - **地址**：上海市虹口区溧阳路611号\n   - **经纬度**：31.2585, 121.4885\n   - **描述**：原为1933年建造的宰牲场，巴西利卡式风格，内部无梁楼盖与伞形柱设计奇特。现为文创空间与剧场，充满建筑美学与历史斑驳感。\n\n### 🍜 美食景点\n\n1. **南翔馒头店（豫园旗舰店）**\n   - **地址**：上海市黄浦区豫园路85号\n   - **经纬度**：31.2277, 121.4882\n   - **描述**：始创于1900年的老字号，以皮薄馅丰、汤汁鲜美的南翔小笼馒头闻名，可堂食观九曲桥景致，体验上海招牌点心。\n\n2. **云南南路美食街**\n   - **地址**：上海市黄浦区云南南路（近金陵东路）\n   - **经纬度**：31.2298, 121.4775\n   - **描述**：老牌美食街，汇集小绍兴白斩鸡、鲜得来排骨年糕、德大西餐等本帮与海派风味，被誉为“上海人从小吃到大的美食街”。\n\n3. **进贤路本帮菜馆群**\n   - **地址**：上海市黄浦区进贤路（茂名南路至陕西南路之间）\n   - **经纬度**：31.2184, 121.4539\n   - **描述**：低调的美食巷，集中了兰心、春、海金滋等经典本帮小馆，以浓油赤酱的红烧肉、油爆虾、草头圈子等私房菜闻名，充满市井烟火气。\n\n4. **绿波廊（豫园）**\n   - **地址**：上海市黄浦区豫园路115号\n   - **经纬度**：31.2267, 121.4886\n   - **描述**：国家级特级酒家，曾接待多国政要，招牌点心有眉毛酥、桂花拉糕等，将海派菜肴与园林景观融合，可赏荷花池景致。\n\n5. **黄河路美食街（近年焕新后）**\n   - **地址**：上海市黄浦区黄河路（南京东路至北京西路段）\n   - **经纬度**：31.2362, 121.4736\n   - **描述**：因《繁花》热播重启的美食记忆，聚集苔圣园、乾隆美食等老牌饭店，主打蟹粉生煎、排骨年糕、国际饭店蝴蝶酥等怀旧味道。\n\n这些景点覆盖了经典文化地标与从知名老店到街区小馆的美食体验，可按需组合游览。",
+  "status": "success",
+  "usage": {
+    "prompt_tokens": 42,
+    "completion_tokens": 1054,
+    "total_tokens": 1096
+  },
+  "latency_ms": 31998
+}</pre>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="stats-panel">
+        <h2>📊 会话统计</h2>
+        <div class="stats-grid">
+            <div class="stat-item">
+                <span class="stat-label">总步骤数</span>
+                <span class="stat-value">0</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">总 Token</span>
+                <span class="stat-value">0</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">总成本</span>
+                <span class="stat-value">$0.0000</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">会话时长</span>
+                <span class="stat-value">32.5s</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">模型调用次数</span>
+                <span class="stat-value">0</span>
+            </div>
+        </div>
+
+        <h3>🔧 工具调用统计</h3>
+        <table class="tool-stats">
+            <tr><th>工具名称</th><th>调用次数</th></tr>
+            <tr><td colspan="2">无工具调用</td></tr>
+        </table>
+
+        
+    </div>
+
+    <script>
+        function toggleDetails(id) {
+            const el = document.getElementById(id);
+            if (el.style.display === 'none' || el.style.display === '') {
+                el.style.display = 'block';
+            } else {
+                el.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>

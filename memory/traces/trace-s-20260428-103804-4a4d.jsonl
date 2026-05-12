@@ -1,0 +1,4 @@
+{"ts": "2026-04-28T10:38:04.563253", "session_id": "s-20260428-103804-4a4d", "step": null, "event": "session_start", "payload": {"agent_name": "AttractionSearch", "agent_type": "SimpleAgent"}}
+{"ts": "2026-04-28T10:38:04.563400", "session_id": "s-20260428-103804-4a4d", "step": null, "event": "message_written", "payload": {"role": "user", "content": "搜索北京的历史文化景点"}}
+{"ts": "2026-04-28T10:38:04.679200", "session_id": "s-20260428-103804-4a4d", "step": 1, "event": "error", "payload": {"error_type": "LLM_ERROR", "message": "OpenAI Function Calling调用失败: Error code: 401 - {'error': {'message': 'Authentication Fails, Your api key: ****here is invalid', 'type': 'authentication_error', 'param': None, 'code': 'invalid_request_error'}}"}}
+{"ts": "2026-04-28T10:38:04.698297", "session_id": "s-20260428-103804-4a4d", "step": null, "event": "session_end", "payload": {"duration": 0.135685, "total_steps": 1, "final_answer": "", "status": "success"}}

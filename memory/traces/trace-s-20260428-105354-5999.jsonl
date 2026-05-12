@@ -1,0 +1,4 @@
+{"ts": "2026-04-28T10:53:54.700688", "session_id": "s-20260428-105354-5999", "step": null, "event": "session_start", "payload": {"agent_name": "WeatherQuery", "agent_type": "SimpleAgent"}}
+{"ts": "2026-04-28T10:53:54.700766", "session_id": "s-20260428-105354-5999", "step": null, "event": "message_written", "payload": {"role": "user", "content": "查询北京的天气预报"}}
+{"ts": "2026-04-28T10:53:54.847471", "session_id": "s-20260428-105354-5999", "step": 1, "event": "error", "payload": {"error_type": "LLM_ERROR", "message": "OpenAI Function Calling调用失败: Error code: 404"}}
+{"ts": "2026-04-28T10:53:54.847690", "session_id": "s-20260428-105354-5999", "step": null, "event": "session_end", "payload": {"duration": 0.147294, "total_steps": 1, "final_answer": "", "status": "success"}}

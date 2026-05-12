@@ -1,0 +1,4 @@
+{"ts": "2026-04-28T11:06:25.535184", "session_id": "s-20260428-110625-b4d0", "step": null, "event": "session_start", "payload": {"agent_name": "HotelSearch", "agent_type": "SimpleAgent"}}
+{"ts": "2026-04-28T11:06:25.535251", "session_id": "s-20260428-110625-b4d0", "step": null, "event": "message_written", "payload": {"role": "user", "content": "搜索北京的经济型酒店酒店"}}
+{"ts": "2026-04-28T11:06:25.595408", "session_id": "s-20260428-110625-b4d0", "step": 1, "event": "error", "payload": {"error_type": "LLM_ERROR", "message": "OpenAI Function Calling调用失败: Error code: 401 - {'error': {'message': 'Authentication Fails, Your api key: ****here is invalid', 'type': 'authentication_error', 'param': None, 'code': 'invalid_request_error'}}"}}
+{"ts": "2026-04-28T11:06:25.596831", "session_id": "s-20260428-110625-b4d0", "step": null, "event": "session_end", "payload": {"duration": 0.062012, "total_steps": 1, "final_answer": "", "status": "success"}}

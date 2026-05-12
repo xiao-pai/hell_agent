@@ -1,0 +1,2 @@
+{"ts": "2026-04-28T10:40:32.491484", "session_id": "s-20260428-104032-6da4", "step": null, "event": "session_start", "payload": {"agent_name": "Planner", "agent_type": "SimpleAgent"}}
+{"ts": "2026-04-28T10:40:32.491554", "session_id": "s-20260428-104032-6da4", "step": null, "event": "message_written", "payload": {"role": "user", "content": "\n用户需求：\n- 目的地：北京\n- 日期：2026-04-28 至 2026-04-30，共3天\n- 偏好：历史文化\n- 预算：中等\n- 交通：公共交通\n- 住宿类型：经济型酒店\n\n景点信息：\n天气信息：\n酒店信息：\n\n请生成完整的3天旅行计划，每天安排2-3个景点，包含预算。\n"}}

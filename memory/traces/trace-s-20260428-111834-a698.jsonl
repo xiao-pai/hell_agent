@@ -1,0 +1,4 @@
+{"ts": "2026-04-28T11:18:34.870706", "session_id": "s-20260428-111834-a698", "step": null, "event": "session_start", "payload": {"agent_name": "AttractionSearch", "agent_type": "SimpleAgent"}}
+{"ts": "2026-04-28T11:18:34.870849", "session_id": "s-20260428-111834-a698", "step": null, "event": "message_written", "payload": {"role": "user", "content": "搜索Shanghai的文化、美食景点"}}
+{"ts": "2026-04-28T11:18:35.064849", "session_id": "s-20260428-111834-a698", "step": 1, "event": "error", "payload": {"error_type": "LLM_ERROR", "message": "OpenAI Function Calling调用失败: Error code: 401 - {'error': {'message': 'Authentication Fails, Your api key: ****here is invalid', 'type': 'authentication_error', 'param': None, 'code': 'invalid_request_error'}}"}}
+{"ts": "2026-04-28T11:18:35.071323", "session_id": "s-20260428-111834-a698", "step": null, "event": "session_end", "payload": {"duration": 0.20109, "total_steps": 1, "final_answer": "", "status": "success"}}

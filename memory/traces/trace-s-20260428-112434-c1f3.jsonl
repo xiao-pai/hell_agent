@@ -1,0 +1,4 @@
+{"ts": "2026-04-28T11:24:34.488169", "session_id": "s-20260428-112434-c1f3", "step": null, "event": "session_start", "payload": {"agent_name": "WeatherQuery", "agent_type": "SimpleAgent"}}
+{"ts": "2026-04-28T11:24:34.488262", "session_id": "s-20260428-112434-c1f3", "step": null, "event": "message_written", "payload": {"role": "user", "content": "查询Shanghai的天气预报"}}
+{"ts": "2026-04-28T11:24:34.587455", "session_id": "s-20260428-112434-c1f3", "step": 1, "event": "error", "payload": {"error_type": "LLM_ERROR", "message": "OpenAI Function Calling调用失败: Error code: 401 - {'error': {'message': 'Authentication Fails, Your api key: ****here is invalid', 'type': 'authentication_error', 'param': None, 'code': 'invalid_request_error'}}"}}
+{"ts": "2026-04-28T11:24:34.588903", "session_id": "s-20260428-112434-c1f3", "step": null, "event": "session_end", "payload": {"duration": 0.101159, "total_steps": 1, "final_answer": "", "status": "success"}}
